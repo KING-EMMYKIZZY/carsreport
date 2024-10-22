@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Stolen Car Reports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --card-background: #ffffff;
+            --error-color: #e74c3c;
+            --success-color: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h2 {
+            font-size: 1.25rem;
+        }
+
+        .logout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Table Responsive Design */
+        .reports-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .reports-table {
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reports-table th,
+        .reports-table td {
+            padding: 0.75rem;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        /* Mobile-first approach for table */
+        @media (max-width: 768px) {
+            .reports-table {
+                display: block;
+            }
+
+            .reports-table thead {
+                display: none;
+            }
+
+            .reports-table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 0.5rem;
+            }
+
+            .reports-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem;
+                border: none;
+                white-space: normal;
+            }
+
+            .reports-table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-right: 1rem;
+            }
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        button[type="submit"],
+        .check-status-btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 1rem auto;
+            display: block;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #tokenDisplay {
+            word-break: break-all;
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                padding: 1rem 2rem;
+            }
+
+            .container {
+                padding: 0 2rem;
+            }
+
+            .card {
+                padding: 2rem;
+            }
+
+            button[type="submit"],
+            .check-status-btn {
+                width: auto;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h2>User Dashboard</h2>
+            <div>
+                <span>Welcome, <span id="userName"></span></span>
+                <a href="index.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h3>Report Stolen Car</h3>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="car_name">Car Name</label>
+                    <input type="text" id="car_name" name="car_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="car_type">Car Type</label>
+                    <input type="text" id="car_type" name="car_type" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="car_model">Car Model</label>
+                    <input type="text" id="car_model" name="car_model" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="plate_number">Plate Number</label>
+                    <input type="text" id="plate_number" name="plate_number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stolen_location">Location Where Car Was Stolen</label>
+                    <textarea id="stolen_location" name="stolen_location" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="permanent_address">Permanent Address</label>
+                    <textarea id="permanent_address" name="permanent_address" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone_number">Active Phone Number</label>
+                    <input type="tel" id="phone_number" name="phone_number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="document">Upload Valid Document (PDF, JPG, JPEG, PNG)</label>
+                    <input type="file" id="document" name="document">
+                </div>
+
+                <button type="submit">Submit Report</button>
+            </form>
+            <div id="tokenDisplay" style="display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h3>Check Report Status</h3>
+            <div class="form-group">
+                <label for="reportToken">Enter Report Token</label>
+                <input type="text" id="reportToken" name="reportToken" required>
+            </div>
+            <button class="check-status-btn" onclick="checkReportStatus()">Check Status</button>
+            <div id="statusDisplay"></div>
+        </div>
+
+        <div class="card">
+            <h3>Your Reports</h3>
+            <div class="reports-table-wrapper">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Car Details</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Admin Comments</th>
+                            <th>Date Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <script>
+        // Simulated user data
+        const userData = {
+            fullName: "John Doe",
+            reports: [
+                {
+                    carDetails: "Toyota Camry 2020",
+                    location: "123 Main St, City",
+                    status: "under_review",
+                    adminComments: "Investigating",
+                    dateSubmitted: "2024-10-20"
+                }
+            ]
+        };
+
+        // Display user name
+        document.getElementById('userName').textContent = userData.fullName;
+
+        // Populate reports table
+        function populateReportsTable() {
+            const tableBody = document.getElementById('reportsTableBody');
+            tableBody.innerHTML = '';
+            userData.reports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Car Details">${report.carDetails}</td>
+                    <td data-label="Location">${report.location}</td>
+                    <td data-label="Status"><span class="status-badge status-${report.status}">${report.status}</span></td>
+                    <td data-label="Admin Comments">${report.adminComments}</td>
+                    <td data-label="Date Submitted">${report.dateSubmitted}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Generate token
+        function generateToken() {
+            return uuid.v4();
+        }
+
+        // Handle form submission
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const token = generateToken();
+            document.getElementById('tokenDisplay').textContent = `Your report token is: ${token}`;
+            document.getElementById('tokenDisplay').style.display = 'block';
+            
+            // Here you would typically send the form data to a server
+            console.log("Form submitted. Token:", token);
+            
+            // Reset form
+            this.reset();
+        });
+
+        // Check report status
+        function checkReportStatus() {
+            const token = document.getElementById('reportToken').value;
+            const statusDisplay = document.getElementById('statusDisplay');
+            
+            // Here you would typically check the status from a server
+            // For this example, we'll just display a mock status
+            statusDisplay.innerHTML = `
+                <p>Status for token ${token}:</p>
+                <p><span class="status-badge status-under_review">Under Review</span></p>
+                <p>Last updated: ${new Date().toLocaleString()}</p>
+            `;
+        }
+
+        // Initialize page
+        populateReportsTable();
+    </script>
+</body>
+</html>
